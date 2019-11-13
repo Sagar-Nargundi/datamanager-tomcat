@@ -1,0 +1,56 @@
+version: "3"
+
+services:
+  rabbitmqservice:
+    container_name: rabbitmqservice
+    image: "rabbitmq:3-management"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    depends_on:
+      - mysqldb
+    networks:
+      - mt-network
+
+
+  mysqldb:
+    container_name: mysqldb
+    image: mysql:5.7
+    command: 
+      - '--sql_mode='
+      - '--lower_case_table_names=1'
+    restart: on-failure
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=datamanager
+    ports:
+      - 3306:3306
+    expose:
+      - '3306'
+    networks:
+      - mt-network
+
+  appcontainer:
+    container_name: webapp
+    restart: on-failure
+    #command: ["/wait-for-it.sh", "mysqldb:3306", "--","run","catalina"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysqldb
+      - rabbitmqservice
+    links:
+      - rabbitmqservice
+      - mysqldb
+    networks:
+      - mt-network
+networks:
+  mt-network:
+    driver: bridge

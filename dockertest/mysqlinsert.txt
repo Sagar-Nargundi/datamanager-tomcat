@@ -1,0 +1,20 @@
+((RMQConnectionFactory)connectionFactory).setHost("rabbitmqservice");
+((RMQConnectionFactory)connectionFactory).setPort(5672);
+
+healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:15672"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+
+
+
+insert into acl_entitlement (name,code,deleteyn,active) values("All Entitlements","superUsr","N",1);
+
+insert into acl_role (name,code,deleteyn,active) values ("techadminIL","techadminIL","N",1);
+
+insert into acl_role_entitlements (id_oid,id_eid,idx) values (1,1,1);
+
+insert into acl_user (code,name,usercreation,datecreation) values ("techadminIL","techadminIL","system",curdate());
+
+insert into acl_user_roles (id_oid,id_eid,idx) values (1,1,1);
